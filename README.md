@@ -96,3 +96,91 @@ This project is fully reproducible and uses only public, de-identified data.
   from google.cloud import bigquery
   client = bigquery.Client.from_service_account_json("your-key.json")
   # Add your load logic here
+
+
+### 3. dbt Modeling
+
+- Install dbt Core (`pip install dbt-bigquery`)
+- Initialize project in `/dbt` and configure `profiles.yml` (see `dbt/README.md`)
+- Run:
+dbt run
+dbt test
+dbt docs generate && dbt docs serve
+
+
+- Review models, custom tests, macros, and docs
+
+---
+
+### 4. Airflow Orchestration
+
+- Spin up Airflow locally (Docker Compose or Astro CLI)
+- Place `readmission_dag.py` in `airflow/dags/`
+- Configure Airflow connections for BigQuery and secrets via environment variables
+- Trigger and monitor DAG runs in the Airflow UI
+
+---
+
+### 5. ML Modeling
+
+- Jupyter or Colab notebook or script in `/modeling`
+- Query features from `fct_patient_readmissions` table in BigQuery
+- Train logistic regression (or XGBoost, etc.), pickle or export the model
+
+---
+
+### 6. Streamlit Dashboard
+
+- Install requirements (`pip install -r streamlit_app/requirements.txt`)
+- Run the app:
+cd streamlit_app
+streamlit run app.py
+
+
+- Connects to BigQuery for live metrics and loads ML model for predictions
+
+---
+
+### Project Highlights
+
+- Advanced dbt: Custom generic tests (such as event date logic), reusable macros, dbt docs and exposures
+- Robust orchestration: Idempotent, dependency-managed Airflow DAGs with Pythonic TaskFlow
+- ML integration: Trained model embedded in Streamlit app for risk scoring
+- Stakeholder focus: Dashboard is simple, interactive, and built for clinical utility
+- Reproducible and secure: All secrets in .env or Airflow UI; no PHI or proprietary code
+
+---
+
+### Screenshots
+
+Add at least:
+
+- Streamlit dashboard demo (GIF or PNG)
+- Airflow DAG run
+- dbt docs lineage graph
+- Example code snippets with annotations
+
+---
+
+### References and Further Reading
+
+- [NRD Data Overview (AHRQ)](https://www.hcup-us.ahrq.gov/nrdoverview.jsp)
+- [dbt Documentation](https://docs.getdbt.com/)
+- [Apache Airflow Docs](https://airflow.apache.org/docs/)
+- [Streamlit Docs](https://docs.streamlit.io/)
+- [BigQuery Python Client](https://cloud.google.com/bigquery/docs/reference/libraries)
+
+---
+
+### Security and Compliance
+
+- No PHI or PII: All data is public, de-identified, and safe for open use
+- Secrets management: All credentials are stored securely (never in code or version control)
+- HIPAA awareness: Project structure and workflow align with industry best practices for clinical analytics
+
+---
+
+### License
+
+This project is licensed under the MIT License. 
+
