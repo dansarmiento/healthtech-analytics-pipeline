@@ -5,8 +5,7 @@ End-to-end demonstration of advanced analytics engineering in healthcare, with B
 
 ---
 
-![Architecture Diagram](docs/architecture.png)  
-*(Sample architecture – update with your own)*
+![Architecture Diagram](docs/healthtech-architecture.png)
 
 ---
 
