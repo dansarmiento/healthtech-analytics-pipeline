@@ -1,0 +1,13 @@
+# .gitignore
+
+# Compiled files
+target/
+dbt_modules/
+dbt_packages/
+
+# Local configs
+.env
+*.db
+*.pyc
+.DS_Store
+__pycache__/
