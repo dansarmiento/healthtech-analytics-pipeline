@@ -1,0 +1,20 @@
+# dbt_project.yml
+
+name: 'your_sofa_project'
+version: '1.0'
+profile: 'your_profile_name'
+config-version: 2
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+analysis-paths: ["analyses"]
+test-paths: ["tests"]
+
+models:
+  your_sofa_project:
+    staging:
+      +materialized: view
+    marts:
+      +materialized: table
