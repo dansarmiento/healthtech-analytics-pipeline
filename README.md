@@ -1,185 +1,161 @@
-# Health-Tech Analytics Pipeline
+# Healthtech Analytics Pipeline: MIMIC-III on BigQuery
 
-Predicting and reducing patient readmission risk using a modern, cloud-native analytics pipeline  
-End-to-end demonstration of advanced analytics engineering in healthcare, with BigQuery, dbt, Airflow, and Streamlit.
+## Section III: The Cornerstone Project — A Production-Grade Health-Tech Analytics Pipeline
 
----
-
-![Architecture Diagram](docs/healthtech-architecture.png)
- 
----
-
-## Table of Contents
-
-- [Project Overview](#project-overview)
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Features](#features)
-- [Setup and Reproducibility](#setup-and-reproducibility)
-  - [1. GCP and BigQuery Setup](#1-gcp-and-bigquery-setup)
-  - [2. Data Ingestion](#2-data-ingestion)
-  - [3. dbt Modeling](#3-dbt-modeling)
-  - [4. Airflow Orchestration](#4-airflow-orchestration)
-  - [5. ML Modeling](#5-ml-modeling)
-  - [6. Streamlit Dashboard](#6-streamlit-dashboard)
-- [Project Highlights](#project-highlights)
-- [Screenshots](#screenshots)
-- [References and Further Reading](#references-and-further-reading)
-- [Security and Compliance](#security-and-compliance)
-- [License](#license)
-- [Author and Contact](#author-and-contact)
+This project is the centerpiece of my portfolio and demonstrates, end-to-end, the competencies of a Senior Analytics Engineer for health technology. It leverages the MIMIC-III public clinical dataset hosted on Google BigQuery, and incorporates analytics engineering (dbt), machine learning (Python), and a live reporting interface (Streamlit).
 
 ---
 
-## Project Overview
+### 3.1 Project Concept: Predicting Organ Failure and ICU Outcomes
 
-Hospital readmissions are a major cost and quality concern in healthcare. This project demonstrates a real-world, end-to-end analytics pipeline to predict 30-day patient readmission risk and enable targeted intervention, using public healthcare data.
+**Dataset:** [MIMIC-III](https://mimic.mit.edu/) clinical database, hosted on Google BigQuery.
 
-Key goals:
-- Showcase modern analytics engineering skills with real-world data
-- Provide a complete, reproducible example for data warehousing, data modeling, orchestration, ML, and BI dashboarding
-- Serve as a reference implementation for healthcare data analytics
+**Key focus:**
 
----
+- Ingest and model ICU patient data
+- Compute SOFA (Sequential Organ Failure Assessment) scores using modular SQL (dbt)
+- Train and evaluate machine learning models for ICU risk prediction
+- Deliver results through an interactive Streamlit dashboard for clinical stakeholders
 
-## Architecture
+**Narrative:**
 
-![Architecture Diagram](docs/architecture.png)  
-Data flows: Data ingest to BigQuery (cloud data warehouse) to dbt (data modeling) to Airflow (orchestration) to ML (Python) to Streamlit (dashboard)
-
----
-
-## Tech Stack
-
-| Technology        | Purpose                                        | Skills Demonstrated          |
-|-------------------|------------------------------------------------|-----------------------------|
-| Google BigQuery   | Cloud data warehouse                           | Cloud SQL, IAM, SQL         |
-| dbt Core          | Data modeling, transformation, testing         | Modular SQL, custom tests   |
-| Apache Airflow    | Workflow orchestration (TaskFlow API)          | DAGs, production ops        |
-| Streamlit         | Interactive dashboard                          | BI, stakeholder focus       |
-| Python (sklearn)  | Predictive modeling (logistic regression)      | ML, data science            |
-| Git/GitHub        | Version control, CI/CD, documentation          | SDLC, DevOps                |
+> This project demonstrates a full-stack analytics pipeline, from raw EHR data to live clinical risk dashboards, enabling clinicians to explore SOFA score drivers, predict patient deterioration, and support early intervention using actionable analytics.
 
 ---
 
-## Features
+### 3.2 Technical Architecture & Blueprint
 
-- Cloud-first data warehousing: All raw and modeled data lives in BigQuery (scalable, secure, industry standard).
-- Modular analytics engineering: dbt project with layered models (staging, intermediate, marts), plus custom tests/macros and full documentation.
-- Production-ready orchestration: Apache Airflow DAG, idempotent and robust, using TaskFlow API and secrets management.
-- ML-driven analytics: Predictive logistic regression model, trained on BigQuery data marts, ready for API or real-time use.
-- User-centric design: Streamlit dashboard for clinical and business users, with interactive filtering and risk scoring.
-- DevOps best practices: Clean repo, CI/CD via GitHub Actions, code reviews, and secure credential handling.
+| Tool/Stack                               | Role in Project                | Key Features Showcased                                            |
+| ---------------------------------------- | ------------------------------ | ----------------------------------------------------------------- |
+| **Google BigQuery**                      | Data Warehouse                 | Serverless analytics; granular access; fast SQL on clinical data  |
+| **dbt Core**                             | Data Transformation & Modeling | Modular, tested SQL; clinical logic tests; docs & exposures       |
+| **Python (scikit-learn, XGBoost, etc.)** | Predictive Modeling            | Jupyter ML; cross-validation; feature engineering; explainability |
+| **Streamlit**                            | End-User Dashboard             | Real-time UI for clinicians; connects to BigQuery & ML models     |
+| **Apache Airflow (optional)**            | Orchestration                  | Idempotent DAGs for production workflows                          |
+| **Git/GitHub**                           | Version Control & CI/CD        | Clean commits; PRs; dbt+ML workflow                               |
 
----
+#### Pipeline Overview
 
-## Setup and Reproducibility
+1. **Data Ingestion & Warehousing (BigQuery)**
 
-This project is fully reproducible and uses only public, de-identified data.
+   - Load MIMIC-III data into `src_mimic` BigQuery dataset
+   - Add dataset, table, and column descriptions in BigQuery UI
+   - IAM/service account best practices
 
-### 1. GCP and BigQuery Setup
+2. **Data Transformation (dbt Core)**
 
-- Create a free GCP account
-- Create a new project and enable BigQuery
-- Create a service account with BigQuery Job User and Data Editor roles
-- Download and securely store your service account key (never commit to git)
+   - Directory: `models/staging/`, `models/intermediate/`, `models/marts/`
+   - Staging: clean/standardize source tables (e.g., `chartevents`, `labevents`)
+   - Intermediate: join and compose shared logic
+   - Marts: analytic outputs & SOFA scores (see `models/marts/sofa.sql`)
+   - Advanced dbt: custom tests, clinical macros, docs, and exposures
 
-### 2. Data Ingestion
+3. **Predictive Modeling (Python ML)**
 
-- Download sample data (for example, AHRQ NRD or Kaggle hospital readmissions dataset)
-- Upload CSVs to a GCS bucket or load directly via BigQuery UI or CLI
-- Example Python script:
+   - Feature selection from marts (SOFA, labs, vitals)
+   - Model training: logistic regression, XGBoost
+   - Validation: cross-validation, ROC-AUC, SHAP
+   - Export: model pickle & inference code
 
-  ```python
-  # data/load_to_bq.py
-  from google.cloud import bigquery
-  client = bigquery.Client.from_service_account_json("your-key.json")
-  # Add your load logic here
+4. **Interactive Dashboard (Streamlit)**
 
+   - KPI dashboards for SOFA, mortality, and ventilator use
+   - Interactive cohort filtering
+   - Predictive scoring: user inputs patient data, returns ML risk score
+   - Live queries to BigQuery
 
-### 3. dbt Modeling
+5. **Orchestration (Apache Airflow — optional/advanced)**
 
-- Install dbt Core (`pip install dbt-bigquery`)
-- Initialize project in `/dbt` and configure `profiles.yml` (see `dbt/README.md`)
-- Run:
-dbt run
-dbt test
-dbt docs generate && dbt docs serve
-
-
-- Review models, custom tests, macros, and docs
+   - Production DAG runs dbt, tests, ML retraining, notifications
 
 ---
 
-### 4. Airflow Orchestration
+### 3.3 Repo Structure
 
-- Spin up Airflow locally (Docker Compose or Astro CLI)
-- Place `readmission_dag.py` in `airflow/dags/`
-- Configure Airflow connections for BigQuery and secrets via environment variables
-- Trigger and monitor DAG runs in the Airflow UI
-
----
-
-### 5. ML Modeling
-
-- Jupyter or Colab notebook or script in `/modeling`
-- Query features from `fct_patient_readmissions` table in BigQuery
-- Train logistic regression (or XGBoost, etc.), pickle or export the model
-
----
-
-### 6. Streamlit Dashboard
-
-- Install requirements (`pip install -r streamlit_app/requirements.txt`)
-- Run the app:
-cd streamlit_app
-streamlit run app.py
-
-
-- Connects to BigQuery for live metrics and loads ML model for predictions
-
----
-
-### Project Highlights
-
-- Advanced dbt: Custom generic tests (such as event date logic), reusable macros, dbt docs and exposures
-- Robust orchestration: Idempotent, dependency-managed Airflow DAGs with Pythonic TaskFlow
-- ML integration: Trained model embedded in Streamlit app for risk scoring
-- Stakeholder focus: Dashboard is simple, interactive, and built for clinical utility
-- Reproducible and secure: All secrets in .env or Airflow UI; no PHI or proprietary code
+```
+healthtech-analytics-pipeline/
+├── README.md
+├── dbt_project.yml
+├── packages.yml
+├── models/
+│   ├── staging/
+│   ├── intermediate/
+│   ├── marts/
+│   │   └── sofa.sql
+│   └── schema.yml
+├── notebooks/
+│   ├── ml_training.ipynb
+│   └── feature_engineering.ipynb
+├── streamlit_app/
+│   ├── app.py
+│   └── requirements.txt
+├── docs/
+│   ├── data_dictionary.md
+│   └── bigquery_screenshot.png
+├── airflow/
+│   └── dag.py
+└── .gitignore
+```
 
 ---
 
-### Screenshots
+### 3.4 Data Dictionary
 
-Add at least:
-
-- Streamlit dashboard demo (GIF or PNG)
-- Airflow DAG run
-- dbt docs lineage graph
-- Example code snippets with annotations
+See [`docs/data_dictionary.md`](docs/data_dictionary.md) for a full BigQuery markdown data dictionary (generated automatically with a Python script).
 
 ---
 
-### References and Further Reading
+### 3.5 Usage
 
-- [NRD Data Overview (AHRQ)](https://www.hcup-us.ahrq.gov/nrdoverview.jsp)
+**To Run the Pipeline Locally**
+
+1. Clone repo; install dbt, Python, and Streamlit dependencies.
+2. Set up GCP credentials (`GOOGLE_APPLICATION_CREDENTIALS`).
+3. Run dbt transformations:
+   ```bash
+   dbt deps
+   dbt run
+   dbt test
+   dbt docs generate
+   ```
+4. Train models in Jupyter:
+   ```bash
+   cd notebooks
+   jupyter notebook
+   ```
+5. Launch Streamlit app:
+   ```bash
+   cd streamlit_app
+   streamlit run app.py
+   ```
+6. (Optional) Start Airflow for orchestration
+
+---
+
+### 3.6 Key Features Demonstrated
+
+- **Cloud analytics engineering:** Modular dbt+BigQuery, data quality, and reproducible SQL
+- **Clinical feature engineering:** SOFA and derived scores, clinical event sequencing
+- **Machine learning modeling:** Feature selection, cross-validation, explainable ML
+- **Interactive analytics:** Real-time Streamlit UI for clinical decision-makers
+- **End-to-end design:** Version control, documentation, orchestration, and CI/CD
+
+---
+
+### 3.7 Real-World Impact
+
+By using **MIMIC-III data and open-source tech**, this pipeline demonstrates senior-level skills in analytics engineering, clinical data science, and product delivery—while avoiding PHI/HIPAA risk.
+
+---
+
+## References
+
+- [MIMIC-III on BigQuery](https://console.cloud.google.com/marketplace/product/bigquery-public-datasets/mimic-iii-clinical)
 - [dbt Documentation](https://docs.getdbt.com/)
-- [Apache Airflow Docs](https://airflow.apache.org/docs/)
 - [Streamlit Docs](https://docs.streamlit.io/)
-- [BigQuery Python Client](https://cloud.google.com/bigquery/docs/reference/libraries)
+- [scikit-learn](https://scikit-learn.org/)
+- [XGBoost](https://xgboost.readthedocs.io/)
+- [Apache Airflow](https://airflow.apache.org/)
 
 ---
-
-### Security and Compliance
-
-- No PHI or PII: All data is public, de-identified, and safe for open use
-- Secrets management: All credentials are stored securely (never in code or version control)
-- HIPAA awareness: Project structure and workflow align with industry best practices for clinical analytics
-
----
-
-### License
-
-This project is licensed under the MIT License. 
 
